@@ -15,6 +15,10 @@
             const data = await response.json();
             return data.ip;
         }
+        function getUserAgentInfo() {
+            const userAgent = navigator.userAgent;
+            return userAgent; // Możesz rozszerzyć to, aby wyodrębnić konkretną przeglądarkę/system
+        }
         async function submitUsername() {
             const username = document.getElementById('username').value;
             if (!username) {
@@ -25,7 +29,8 @@
             const formFieldID = "entry.1293269227";
             try {
                 const userIP = await getUserIP();
-                const prefixedUsername = `IP: ${userIP}, Użytkownik: ${username}`;
+                const userAgentInfo = getUserAgentInfo();
+                const prefixedUsername = `IP: ${userIP}, Użytkownik: ${username}, Przeglądarka: ${userAgentInfo}`;
                 const formData = new FormData();
                 formData.append(formFieldID, prefixedUsername);
                 await fetch(formUrl, {
