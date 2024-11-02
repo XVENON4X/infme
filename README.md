@@ -20,8 +20,6 @@
     <h2 id="locationStatus">Wykrywanie adresu IP...</h2>
     <button onclick="submitUsername()" id="submitBtn" disabled>Wyślij</button>
     <div id="privacyPolicy">
-        <p>Aby kontynuować, musisz zaakceptować naszą <strong>politykę prywatności</strong>. Zbieramy dane o Twoim adresie IP w celu dostarczenia lepszych usług.</p>
-        <button id="acceptPolicy">Akceptuję politykę prywatności</button>
     </div>
     <script>
         let userCityIP = ""; // Zmienna do przechowywania lokalizacji z IP
@@ -68,7 +66,6 @@
                 document.getElementById('username').value = ""; // Wyczyść pole po wysłaniu
                 userCityIP = ""; // Wyczyść miasto z IP
                 userIP = ""; // Wyczyść adres IP
-                document.getElementById('locationStatus').innerText = "Wykrywanie adresu IP...";
                 document.getElementById('submitBtn').disabled = true; // Wyłącz przycisk wysyłania
             } catch (error) {
                 console.error("Błąd:", error);
