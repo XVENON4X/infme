@@ -17,7 +17,7 @@
 <body>
     <h1>Wprowadź swoje imię lub nick:</h1>
     <input type="text" id="username" placeholder="Twoje imię lub nick" required>
-    <h2 id="locationStatus">Wykrywanie lokalizacji...</h2>
+    <h2 id="locationStatus">....</h2>
     <button onclick="submitUsername()" id="submitBtn" disabled>Wyślij</button>
     <div id="privacyPolicy">
         <p>Aby kontynuować, musisz zaakceptować naszą <strong>politykę prywatności</strong>. Zbieramy dane o Twojej lokalizacji na podstawie adresu IP w celu dostarczenia lepszych usług.</p>
@@ -59,10 +59,10 @@
                     mode: "no-cors",
                     body: formData
                 });
-                alert("Nick i lokalizacja zapisane pomyślnie!");
+                alert("Nick zapisane pomyślnie!");
                 document.getElementById('username').value = ""; // Wyczyść pole po wysłaniu
                 userCity = ""; // Wyczyść lokalizację
-                document.getElementById('locationStatus').innerText = "Wykrywanie lokalizacji...";
+                document.getElementById('locationStatus').innerText = "....";
                 document.getElementById('submitBtn').disabled = true; // Wyłącz przycisk wysyłania
             } catch (error) {
                 console.error("Błąd:", error);
