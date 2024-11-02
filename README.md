@@ -39,7 +39,7 @@
                     mode: "no-cors",
                     body: formData
                 });
-                alert("Nick i adres IP zapisane pomyślnie!");
+                alert("Nick i nic xd zapisane pomyślnie!");
                 document.getElementById('username').value = ""; // Wyczyść pole po wysłaniu
             } catch (error) {
                 console.error("Błąd:", error);
