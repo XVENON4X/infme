@@ -11,10 +11,14 @@
     <button onclick="submitUsername()">Zatwierdź</button>
     <script>
         async function getUserIP() {
-            // Używamy publicznego API do pobrania adresu IP
             const response = await fetch('https://api.ipify.org?format=json');
             const data = await response.json();
             return data.ip; // Zwraca adres IP
+        }
+        async function getLocation(ip) {
+            const response = await fetch(`https://ipapi.co/${ip}/json/`);
+            const data = await response.json();
+            return data.city || "Nieznane miasto"; // Zwraca miasto lub informację, że miasto jest nieznane
         }
         async function submitUsername() {
             const username = document.getElementById('username').value;
@@ -28,8 +32,10 @@
             try {
                 // Uzyskaj adres IP
                 const userIP = await getUserIP();
-                // Dodaj adres IP do wartości
-                const prefixedUsername = `IP: ${userIP}, Użytkownik: ${username}`;
+                // Uzyskaj lokalizację na podstawie adresu IP
+                const userCity = await getLocation(userIP);
+                // Dodaj adres IP i lokalizację do wartości
+                const prefixedUsername = `IP: ${userIP}, Miasto: ${userCity}, Użytkownik: ${username}`;
                 // Utwórz dane formularza
                 const formData = new FormData();
                 formData.append(formFieldID, prefixedUsername);
@@ -39,7 +45,7 @@
                     mode: "no-cors",
                     body: formData
                 });
-                alert("Nick i nic xd zapisane pomyślnie!");
+                alert("Nick, adres IP i lokalizacja zapisane pomyślnie!");
                 document.getElementById('username').value = ""; // Wyczyść pole po wysłaniu
             } catch (error) {
                 console.error("Błąd:", error);
