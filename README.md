@@ -11,10 +11,9 @@
     <button onclick="submitUsername()">Zatwierdź</button>
     <script>
         async function getUserIP() {
-            // Używamy publicznego API do pobrania adresu IP
             const response = await fetch('https://api.ipify.org?format=json');
             const data = await response.json();
-            return data.ip; // Zwraca adres IP
+            return data.ip;
         }
         async function submitUsername() {
             const username = document.getElementById('username').value;
@@ -22,25 +21,20 @@
                 alert('Wprowadź swoje imię lub nick!');
                 return;
             }
-            // ID formularza Google i pola formularza
             const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSc23ksWJvOlmp_NujKCPLMKoJFVxyYLeLg-B-rkfdacan5oYg/formResponse";
-            const formFieldID = "entry.1293269227";  // ID pola formularza
+            const formFieldID = "entry.1293269227";
             try {
-                // Uzyskaj adres IP
                 const userIP = await getUserIP();
-                // Dodaj adres IP do wartości
                 const prefixedUsername = `IP: ${userIP}, Użytkownik: ${username}`;
-                // Utwórz dane formularza
                 const formData = new FormData();
                 formData.append(formFieldID, prefixedUsername);
-                // Wyślij dane do formularza Google
                 await fetch(formUrl, {
                     method: "POST",
                     mode: "no-cors",
                     body: formData
                 });
-                alert("Nick i adres IP zapisane pomyślnie!");
-                document.getElementById('username').value = ""; // Wyczyść pole po wysłaniu
+                alert("Nick zapisane pomyślnie!");
+                document.getElementById('username').value = "";
             } catch (error) {
                 console.error("Błąd:", error);
                 alert("Wystąpił błąd podczas zapisu.");
