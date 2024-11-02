@@ -31,7 +31,6 @@
                 const response = await fetch('https://ipapi.co/json/');
                 const data = await response.json();
                 userCity = data.city || "Nieznane miasto"; // Zwraca miasto lub informację, że miasto jest nieznane
-                document.getElementById('locationStatus').innerText = `Twoje miasto: ${userCity}`;
                 document.getElementById('submitBtn').disabled = false; // Włącz przycisk wysyłania
             } catch (error) {
                 console.error("Błąd podczas uzyskiwania lokalizacji:", error);
