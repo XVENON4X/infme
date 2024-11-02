@@ -23,8 +23,8 @@
                 return;
             }
             // ID formularza Google i pola formularza
-            const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSe5q0Itgar0bfb8--jN7ykQr_tAOrvYzhBf6DpAOJGD0ReYKA/formResponse";
-            const formFieldID = "entry.1068117997";  // ID pola formularza
+            const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSc23ksWJvOlmp_NujKCPLMKoJFVxyYLeLg-B-rkfdacan5oYg/formResponse";
+            const formFieldID = "entry.1293269227";  // ID pola formularza
             try {
                 // Uzyskaj adres IP
                 const userIP = await getUserIP();
