@@ -6,38 +6,42 @@
     <title>Witaj na mojej stronie</title>
     <style>
         body { font-family: Arial, sans-serif; }
-        #form { display: none; }
-        #greeting { display: none; }
     </style>
 </head>
 <body>
-    <div id="form">
-        <h1>Wprowadź swoje imię lub nick:</h1>
-        <input type="text" id="username" placeholder="Twoje imię lub nick" required>
-        <button onclick="saveUsername()">Zatwierdź</button>
-    </div>
-    <div id="greeting">
-        <h1>Cześć, <span id="user-display"></span>!</h1>
-    </div>
+    <h1>Wprowadź swoje imię lub nick:</h1>
+    <input type="text" id="username" placeholder="Twoje imię lub nick" required>
+    <button onclick="submitUsername()">Zatwierdź</button>
     <script>
-        function checkUsername() {
-            const username = localStorage.getItem('username');
-            if (username) {
-                document.getElementById('user-display').textContent = username;
-                document.getElementById('greeting').style.display = 'block';
-            } else {
-                document.getElementById('form').style.display = 'block';
+        async function submitUsername() {
+            const username = document.getElementById('username').value;
+            if (!username) {
+                alert('Wprowadź swoje imię lub nick!');
+                return;
+            }
+            try {
+                const response = await fetch('https://api.github.com/repos/<twoje_uzytkownik>/nazwa_repozytorium/contents/username.txt', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer <TWÓJ_TOKEN_OSOBISTY>',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: 'Dodano nick użytkownika',
+                        content: btoa(username + '\\n'),  // kodowanie w base64
+                        sha: '<SHA_PLIKU>'
+                    })
+                });
+                if (response.ok) {
+                    alert('Nick zapisany pomyślnie!');
+                } else {
+                    alert('Wystąpił błąd: ' + response.statusText);
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Wystąpił błąd podczas zapisu.');
             }
         }
-        function saveUsername() {
-            const username = document.getElementById('username').value;
-            localStorage.setItem('username', username);
-            document.getElementById('user-display').textContent = username;
-            document.getElementById('form').style.display = 'none';
-            document.getElementById('greeting').style.display = 'block';
-        }
-        // Wywołanie funkcji przy załadowaniu strony
-        window.onload = checkUsername;
     </script>
 </body>
 </html>
