@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wprowadź swój nick</title>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        input, button { font-size: 1.2em; padding: 8px; }
-    </style>
 </head>
 <body>
     <h1>Wprowadź swoje imię lub nick:</h1>
@@ -20,22 +16,20 @@
                 alert('Wprowadź swoje imię lub nick!');
                 return;
             }
-            // URL do formularza Google (z odpowiednim ID formularza)
+            // URL formularza Google
             const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSe5q0Itgar0bfb8--jN7ykQr_tAOrvYzhBf6DpAOJGD0ReYKA/formResponse";
-            // ID pola formularza (np. "entry.1234567890")
-            const formFieldID = "entry.1234567890";
-            // Utworzenie danych do wysłania
+            // Użyj identyfikatora pola formularza Google
+            const formFieldID = "entry.1068117997";
+            // Utwórz dane formularza z nickiem
             const formData = new FormData();
             formData.append(formFieldID, username);
             try {
-                // Wysłanie danych do formularza Google z opóźnieniem
+                // Wyślij dane do formularza Google
                 await fetch(formUrl, {
                     method: "POST",
                     mode: "no-cors",
                     body: formData
                 });
-                // Dodaj opóźnienie po wysłaniu danych, aby formularz Google mógł je przetworzyć
-                await new Promise(resolve => setTimeout(resolve, 500));
                 alert("Nick zapisany pomyślnie!");
                 document.getElementById('username').value = ""; // Wyczyść pole po wysłaniu
             } catch (error) {
