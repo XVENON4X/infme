@@ -3,37 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wprowadź swój nick i lokalizację</title>
+    <title>Wprowadź swój nick</title>
+    <style>
+        #privacyPolicy {
+            display: none; /* Ukryj politykę prywatności na początku */
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 20px 0;
+            background-color: #f9f9f9;
+        }
+    </style>
 </head>
 <body>
     <h1>Wprowadź swoje imię lub nick:</h1>
     <input type="text" id="username" placeholder="Twoje imię lub nick" required>
-    <h2>Wykrywanie lokalizacji...</h2>
-    <p id="locationStatus">Kliknij przycisk, aby uzyskać swoje miasto.</p>
-    <button onclick="getLocation()">Uzyskaj lokalizację</button>
+    <h2 id="locationStatus">Wykrywanie lokalizacji...</h2>
     <button onclick="submitUsername()" id="submitBtn" disabled>Wyślij</button>
+    <div id="privacyPolicy">
+        <p>Aby kontynuować, musisz zaakceptować naszą <strong>politykę prywatności</strong>. Zbieramy dane o Twojej lokalizacji na podstawie adresu IP w celu dostarczenia lepszych usług.</p>
+        <button id="acceptPolicy">Akceptuję politykę prywatności</button>
+    </div>
     <script>
         let userCity = ""; // Zmienna do przechowywania lokalizacji
+        let policyAccepted = false; // Zmienna do przechowywania stanu akceptacji polityki
         async function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(async (position) => {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-                    const city = await getCityFromCoordinates(lat, lon);
-                    userCity = city;
-                    document.getElementById('locationStatus').innerText = `Twoje miasto: ${userCity}`;
-                    document.getElementById('submitBtn').disabled = false; // Włącz przycisk wysyłania
-                }, () => {
-                    document.getElementById('locationStatus').innerText = 'Nie udało się uzyskać lokalizacji.';
-                });
-            } else {
-                document.getElementById('locationStatus').innerText = 'Geolokalizacja nie jest wspierana przez tę przeglądarkę.';
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                userCity = data.city || "Nieznane miasto"; // Zwraca miasto lub informację, że miasto jest nieznane
+                document.getElementById('locationStatus').innerText = `Twoje miasto: ${userCity}`;
+                document.getElementById('submitBtn').disabled = false; // Włącz przycisk wysyłania
+            } catch (error) {
+                console.error("Błąd podczas uzyskiwania lokalizacji:", error);
+                document.getElementById('locationStatus').innerText = 'Nie udało się uzyskać lokalizacji.';
             }
-        }
-        async function getCityFromCoordinates(lat, lon) {
-            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
-            const data = await response.json();
-            return data.address.city || data.address.town || "Nieznane miasto"; // Zwraca miasto lub informację, że miasto jest nieznane
         }
         async function submitUsername() {
             const username = document.getElementById('username').value;
@@ -59,13 +62,24 @@
                 alert("Nick i lokalizacja zapisane pomyślnie!");
                 document.getElementById('username').value = ""; // Wyczyść pole po wysłaniu
                 userCity = ""; // Wyczyść lokalizację
-                document.getElementById('locationStatus').innerText = "Kliknij przycisk, aby uzyskać swoje miasto.";
+                document.getElementById('locationStatus').innerText = "Wykrywanie lokalizacji...";
                 document.getElementById('submitBtn').disabled = true; // Wyłącz przycisk wysyłania
             } catch (error) {
                 console.error("Błąd:", error);
                 alert("Wystąpił błąd podczas zapisu.");
             }
         }
+        // Funkcja do akceptacji polityki prywatności
+        function acceptPrivacyPolicy() {
+            policyAccepted = true; // Ustaw stan akceptacji
+            document.getElementById('privacyPolicy').style.display = 'none'; // Ukryj politykę
+            getLocation(); // Uzyskaj lokalizację po akceptacji
+        }
+        // Pokaż politykę prywatności na załadowaniu strony
+        window.onload = function() {
+            document.getElementById('privacyPolicy').style.display = 'block';
+            document.getElementById('acceptPolicy').onclick = acceptPrivacyPolicy;
+        };
     </script>
 </body>
 </html>
