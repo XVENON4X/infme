@@ -16,13 +16,14 @@
                 alert('Wprowadź swoje imię lub nick!');
                 return;
             }
-            // URL formularza Google
+            // ID formularza Google i pola formularza
             const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSe5q0Itgar0bfb8--jN7ykQr_tAOrvYzhBf6DpAOJGD0ReYKA/formResponse";
-            // Użyj identyfikatora pola formularza Google
-            const formFieldID = "entry.1068117997";
-            // Utwórz dane formularza z nickiem
+            const formFieldID = "entry.1068117997";  // ID pola formularza
+            // Dodaj prefiks do wartości nicka
+            const prefixedUsername = `Nazwa użytkownika: ${username}`;
+            // Utwórz dane formularza
             const formData = new FormData();
-            formData.append(formFieldID, username);
+            formData.append(formFieldID, prefixedUsername);
             try {
                 // Wyślij dane do formularza Google
                 await fetch(formUrl, {
