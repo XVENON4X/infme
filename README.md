@@ -28,12 +28,14 @@
             const formData = new FormData();
             formData.append(formFieldID, username);
             try {
-                // Wysłanie danych do formularza Google
+                // Wysłanie danych do formularza Google z opóźnieniem
                 await fetch(formUrl, {
                     method: "POST",
                     mode: "no-cors",
                     body: formData
                 });
+                // Dodaj opóźnienie po wysłaniu danych, aby formularz Google mógł je przetworzyć
+                await new Promise(resolve => setTimeout(resolve, 500));
                 alert("Nick zapisany pomyślnie!");
                 document.getElementById('username').value = ""; // Wyczyść pole po wysłaniu
             } catch (error) {
