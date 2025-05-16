@@ -1,5 +1,7 @@
 #!/bin/bash
-set -e
+set -xe
+
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 AGENT_ID="$1"
 if [ -z "$AGENT_ID" ]; then
@@ -8,9 +10,6 @@ if [ -z "$AGENT_ID" ]; then
 fi
 
 echo "[install_agent] Instalacja agenta z ID: $AGENT_ID"
-
-# Aktualizacja i instalacja python3-venv, ale bez sudo (zakładamy, że masz już zainstalowane)
-echo "[install_agent] Sprawdzanie czy python3 i venv są dostępne..."
 
 if ! command -v python3 >/dev/null 2>&1; then
   echo "[install_agent] ERROR: python3 nie jest zainstalowany! Proszę zainstaluj ręcznie."
@@ -33,7 +32,6 @@ echo "[install_agent] Instalacja biblioteki requests"
 pip install --upgrade pip
 pip install requests
 
-# Zapis agent.py
 cat > "$AGENT_DIR/agent.py" << 'EOF'
 import time, subprocess, requests, logging, os, sys
 
@@ -107,20 +105,15 @@ EOF
 
 deactivate
 
-# Uruchomienie agenta w tle i zapis PID-a
-echo "[install_agent] Uruchamianie agenta w tle..."
-
 AGENT_LOG="$AGENT_DIR/agent.log"
 AGENT_PIDFILE="$AGENT_DIR/agent.pid"
 
-# Jeśli agent już działa, zatrzymaj go
 if [ -f "$AGENT_PIDFILE" ] && kill -0 $(cat "$AGENT_PIDFILE") 2>/dev/null; then
-  echo "[install_agent] Agent już działa, zatrzymuję go najpierw."
+  echo "[install_agent] Agent już działa, zatrzymuję go."
   kill $(cat "$AGENT_PIDFILE")
   sleep 2
 fi
 
-# Start agenta w tle
 nohup "$AGENT_DIR/venv/bin/python" "$AGENT_DIR/agent.py" "$AGENT_ID" > "$AGENT_LOG" 2>&1 &
 
 echo $! > "$AGENT_PIDFILE"
