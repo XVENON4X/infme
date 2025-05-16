@@ -7,9 +7,33 @@ if [ -z "$AGENT_ID" ]; then
   exit 1
 fi
 
+# Sprawdzenie python3
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "[install_agent] ERROR: python3 nie jest zainstalowany! Zainstaluj go ręcznie."
+  exit 1
+fi
+
+# Sprawdzenie pip
+if ! command -v pip3 >/dev/null 2>&1; then
+  echo "[install_agent] pip3 nie jest zainstalowany! Próbuję zainstalować..."
+  if command -v apt-get >/dev/null 2>&1; then
+    echo "[install_agent] Instaluję python3-pip przez apt-get"
+    sudo apt-get update && sudo apt-get install -y python3-pip
+  else
+    echo "[install_agent] Brak apt-get. Zainstaluj pip3 ręcznie!"
+    exit 1
+  fi
+fi
+
+# Sprawdzenie requests
+python3 -c "import requests" 2>/dev/null || {
+  echo "[install_agent] requests nie jest zainstalowany, instaluję przez pip3"
+  pip3 install --user requests
+}
+
 AGENT_DIR="$HOME/agent_$AGENT_ID"
 mkdir -p "$AGENT_DIR"
-pip install requests
+
 cat > "$AGENT_DIR/agent.py" << 'EOF'
 import time, subprocess, requests, logging, os, sys
 
