@@ -9,7 +9,7 @@ fi
 
 AGENT_DIR="$HOME/agent_$AGENT_ID"
 mkdir -p "$AGENT_DIR"
-
+pip install requests
 cat > "$AGENT_DIR/agent.py" << 'EOF'
 import time, subprocess, requests, logging, os, sys
 
