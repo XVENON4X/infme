@@ -9,20 +9,27 @@ fi
 
 echo "[install_agent] Instalacja agenta z ID: $AGENT_ID"
 
-# Aktualizacja i python3 + venv
-echo "[install_agent] Aktualizacja systemu i instalacja python3-venv"
-sudo apt update
-sudo apt install -y python3 python3-venv python3-pip curl
+# Aktualizacja i instalacja python3-venv, ale bez sudo (zakładamy, że masz już zainstalowane)
+echo "[install_agent] Sprawdzanie czy python3 i venv są dostępne..."
 
-# Utworzenie katalogu agenta
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "[install_agent] ERROR: python3 nie jest zainstalowany! Proszę zainstaluj ręcznie."
+  exit 1
+fi
+
+if ! python3 -m venv --help >/dev/null 2>&1; then
+  echo "[install_agent] ERROR: python3-venv nie jest zainstalowany! Proszę zainstaluj ręcznie."
+  exit 1
+fi
+
 AGENT_DIR="$HOME/agent_$AGENT_ID"
 mkdir -p "$AGENT_DIR"
 
-# Tworzenie i aktywacja virtualenv
+echo "[install_agent] Tworzenie i aktywacja virtualenv"
 python3 -m venv "$AGENT_DIR/venv"
 source "$AGENT_DIR/venv/bin/activate"
 
-# Instalacja biblioteki requests
+echo "[install_agent] Instalacja biblioteki requests"
 pip install --upgrade pip
 pip install requests
 
@@ -98,35 +105,24 @@ if __name__ == '__main__':
     main()
 EOF
 
-# Dezaktywuj virtualenv (dla bezpieczeństwa)
 deactivate
 
-# Tworzenie pliku systemd do automatycznego uruchamiania
-SERVICE_FILE="/etc/systemd/system/agent_$AGENT_ID.service"
-echo "[install_agent] Tworzenie usługi systemd: $SERVICE_FILE"
+# Uruchomienie agenta w tle i zapis PID-a
+echo "[install_agent] Uruchamianie agenta w tle..."
 
-sudo bash -c "cat > $SERVICE_FILE" <<EOF
-[Unit]
-Description=Agent $AGENT_ID service
-After=network.target
+AGENT_LOG="$AGENT_DIR/agent.log"
+AGENT_PIDFILE="$AGENT_DIR/agent.pid"
 
-[Service]
-User=$USER
-WorkingDirectory=$AGENT_DIR
-ExecStart=$AGENT_DIR/venv/bin/python $AGENT_DIR/agent.py $AGENT_ID
-Restart=always
-RestartSec=5
+# Jeśli agent już działa, zatrzymaj go
+if [ -f "$AGENT_PIDFILE" ] && kill -0 $(cat "$AGENT_PIDFILE") 2>/dev/null; then
+  echo "[install_agent] Agent już działa, zatrzymuję go najpierw."
+  kill $(cat "$AGENT_PIDFILE")
+  sleep 2
+fi
 
-[Install]
-WantedBy=multi-user.target
-EOF
+# Start agenta w tle
+nohup "$AGENT_DIR/venv/bin/python" "$AGENT_DIR/agent.py" "$AGENT_ID" > "$AGENT_LOG" 2>&1 &
 
-# Włączanie i start usługi
-echo "[install_agent] Włączanie i uruchamianie usługi systemd"
-sudo systemctl daemon-reload
-sudo systemctl enable "agent_$AGENT_ID.service"
-sudo systemctl start "agent_$AGENT_ID.service"
+echo $! > "$AGENT_PIDFILE"
 
-echo "[install_agent] Instalacja i uruchomienie agenta zakończone."
-echo "[install_agent] Status usługi:"
-sudo systemctl status "agent_$AGENT_ID.service" --no-pager
+echo "[install_agent] Agent uruchomiony z PID $(cat "$AGENT_PIDFILE"). Log: $AGENT_LOG"
