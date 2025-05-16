@@ -1,7 +1,5 @@
 #!/bin/bash
-set -xe
-
-export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+set -e
 
 AGENT_ID="$1"
 if [ -z "$AGENT_ID" ]; then
@@ -9,28 +7,8 @@ if [ -z "$AGENT_ID" ]; then
   exit 1
 fi
 
-echo "[install_agent] Instalacja agenta z ID: $AGENT_ID"
-
-if ! command -v python3 >/dev/null 2>&1; then
-  echo "[install_agent] ERROR: python3 nie jest zainstalowany! Proszę zainstaluj ręcznie."
-  exit 1
-fi
-
-if ! python3 -m venv --help >/dev/null 2>&1; then
-  echo "[install_agent] ERROR: python3-venv nie jest zainstalowany! Proszę zainstaluj ręcznie."
-  exit 1
-fi
-
 AGENT_DIR="$HOME/agent_$AGENT_ID"
 mkdir -p "$AGENT_DIR"
-
-echo "[install_agent] Tworzenie i aktywacja virtualenv"
-python3 -m venv "$AGENT_DIR/venv"
-source "$AGENT_DIR/venv/bin/activate"
-
-echo "[install_agent] Instalacja biblioteki requests"
-pip install --upgrade pip
-pip install requests
 
 cat > "$AGENT_DIR/agent.py" << 'EOF'
 import time, subprocess, requests, logging, os, sys
@@ -103,18 +81,16 @@ if __name__ == '__main__':
     main()
 EOF
 
-deactivate
-
 AGENT_LOG="$AGENT_DIR/agent.log"
 AGENT_PIDFILE="$AGENT_DIR/agent.pid"
 
 if [ -f "$AGENT_PIDFILE" ] && kill -0 $(cat "$AGENT_PIDFILE") 2>/dev/null; then
-  echo "[install_agent] Agent już działa, zatrzymuję go."
+  echo "[install_agent] Agent działa, zatrzymuję go..."
   kill $(cat "$AGENT_PIDFILE")
   sleep 2
 fi
 
-nohup "$AGENT_DIR/venv/bin/python" "$AGENT_DIR/agent.py" "$AGENT_ID" > "$AGENT_LOG" 2>&1 &
+nohup python3 "$AGENT_DIR/agent.py" "$AGENT_ID" > "$AGENT_LOG" 2>&1 &
 
 echo $! > "$AGENT_PIDFILE"
 
